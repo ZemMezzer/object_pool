@@ -26,9 +26,12 @@ namespace ObjectPool
             onRelease?.Invoke(this);
         }
 
-        protected void OnDisable()
+        private void OnDisable()
         {
             onRelease?.Invoke(this);
+            OnObjectDisable();
         }
+        
+        protected virtual void OnObjectDisable(){}
     }
 }

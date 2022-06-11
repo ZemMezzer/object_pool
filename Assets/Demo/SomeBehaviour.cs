@@ -7,13 +7,13 @@ namespace ObjectPool.Demo
     public class SomeBehaviour : MonoBehaviour
     {
         [SerializeField] private PooledObject pooledObjectPrefab;
-        private ObjectPool<PooledObject> pooledObjectsPool;
+        private ComponentObjectPool<PooledObject> pooledObjectsPool;
         
         private readonly WaitForSecondsRealtime waitForSecondsRealtime = new WaitForSecondsRealtime(5);
 
         private void Awake()
         {
-            pooledObjectsPool = ObjectPool<PooledObject>.Get(pooledObjectPrefab, 100, HideFlags.HideInHierarchy | HideFlags.HideInInspector, true);
+            pooledObjectsPool = ComponentObjectPool<PooledObject>.Get(pooledObjectPrefab, 100, HideFlags.HideInHierarchy | HideFlags.HideInInspector, true);
         }
 
         private IEnumerator Start()

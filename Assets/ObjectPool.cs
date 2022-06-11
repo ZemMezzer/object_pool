@@ -1,162 +1,52 @@
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace ObjectPool
 {
-    public class ObjectPool<T> where T : Component
+    public class ObjectPool<T> where T : class, new()
     {
-        private static readonly Dictionary<Component, ObjectPool<T>> PoolsPool = new Dictionary<Component, ObjectPool<T>>();
-
-        public static ObjectPool<T> Get(Component instance, int fillAmount, HideFlags flags, bool dontDestroyOnLoad)
+        private static readonly Dictionary<T, ObjectPool<T>> PoolsPool = new Dictionary<T, ObjectPool<T>>();
+        
+        public static ObjectPool<T> Get(T instance, int fillAmount)
         {
             if (!PoolsPool.ContainsKey(instance))
             {
-                ObjectPool<T> poolInstance = new ObjectPool<T>(instance, flags, dontDestroyOnLoad);
+                ObjectPool<T> poolInstance = new ObjectPool<T>(instance);
                 PoolsPool.Add(instance, poolInstance);
                 poolInstance.Fill(fillAmount);
             }
             
             return PoolsPool[instance];
         }
-
-        public static ObjectPool<T> Get(Component instance, int fillAmount)
+        
+        public static ObjectPool<T> Get(T instance)
         {
-            return Get(instance, fillAmount, HideFlags.None, false);
+            return Get(instance, 0);
         }
         
-        public static ObjectPool<T> Get(Component instance, HideFlags flags)
-        {
-            return Get(instance, 0, flags, false);
-        }
-        
-        public static ObjectPool<T> Get(Component instance, bool dontDestroyOnLoad)
-        {
-            return Get(instance, 0, HideFlags.None, dontDestroyOnLoad);
-        }
-        
-        public static ObjectPool<T> Get(Component instance, int fillAmount, bool dontDestroyOnLoad)
-        {
-            return Get(instance, fillAmount, HideFlags.None, dontDestroyOnLoad);
-        }
-        
-        public static ObjectPool<T> Get(Component instance, HideFlags flags, bool dontDestroyOnLoad)
-        {
-            return Get(instance, 0, flags, dontDestroyOnLoad);
-        }
-
-        public static ObjectPool<T> Get(Component instance)
-        {
-            return Get(instance, 0, HideFlags.None, false);
-        }
-        
-        public static ObjectPool<T> Get(GameObject instance, int fillAmount, HideFlags flags)
-        {
-            return Get(instance.transform, fillAmount, flags, false);
-        }
-        
-        
-        public static ObjectPool<T> Get(GameObject instance, int fillAmount)
-        {
-            return Get(instance.transform, fillAmount, HideFlags.None, false);
-        }
-        
-        public static ObjectPool<T> Get(GameObject instance, HideFlags flags)
-        {
-            return Get(instance.transform, 0, flags, false);
-        }
-        
-        public static ObjectPool<T> Get(GameObject instance, bool dontDestroyOnLoad)
-        {
-            return Get(instance.transform, 0, HideFlags.None, dontDestroyOnLoad);
-        }
-        
-        public static ObjectPool<T> Get(GameObject instance, int fillAmount, bool dontDestroyOnLoad)
-        {
-            return Get(instance.transform, fillAmount, HideFlags.None, dontDestroyOnLoad);
-        }
-        
-        public static ObjectPool<T> Get(GameObject instance, HideFlags flags, bool dontDestroyOnLoad)
-        {
-            return Get(instance.transform, 0, flags, dontDestroyOnLoad);
-        }
-        
-        public static ObjectPool<T> Get(GameObject instance)
-        {
-            return Get(instance.transform);
-        }
-
         private readonly Stack<T> poolQueue = new Stack<T>();
-        private readonly Component poolObject;
-        private readonly HideFlags hideFlags;
-        private readonly bool dontDestroyOnLoad;
+        private readonly T poolObject;
         
-        private ObjectPool(Component instance, HideFlags flags, bool dontDestroy)
+        private ObjectPool(T instance)
         {
             poolObject = instance;
-            hideFlags = flags;
-            dontDestroyOnLoad = dontDestroy;
         }
-
+        
         public T Get()
         {
-            Component instance = null;
-            if (poolQueue.Count <= 0)
-            {
-                instance = Object.Instantiate(poolObject) as T;
-                instance.gameObject.SetActive(true);
-                instance.gameObject.hideFlags = hideFlags;
-
-                if(dontDestroyOnLoad)
-                    Object.DontDestroyOnLoad(instance.gameObject);
-                
-                if(instance is PoolObject poolObjectInstance)
-                    poolObjectInstance.Initialize((obj) => Put(obj as T));
-            }
-            else
-            {
-                instance = poolQueue.Pop();
-                instance.gameObject.SetActive(true);
-            }
-            
-            return (T)instance;
-        }
-
-        public T Get(Vector3 position)
-        {
-            var instance = Get();
-            instance.transform.position = position;
+            var instance = poolQueue.Count <= 0 ? new T() : poolQueue.Pop();
             return instance;
         }
-
-        public T Get(Vector3 position, Quaternion rotation)
-        {
-            var instance = Get(position);
-            instance.transform.rotation = rotation;
-            return instance;
-        }
-
-        public T Get(Transform transform)
-        {
-            var instance = Get(transform.position, transform.rotation);
-            instance.transform.SetParent(transform);
-            return instance;
-        }
-
+        
         public void Put(T instance)
         {
-            if(!instance.gameObject.activeInHierarchy)
-                return;
-            
-            instance.gameObject.SetActive(false);
-            instance.transform.SetParent(null);
             poolQueue.Push(instance);
         }
-
+        
         public void Fill(int amount)
         {
             for (int i = 0; i < amount; i++)
             {
-                var instance = Object.Instantiate(poolObject) as T;
+                var instance = poolQueue.Count <= 0 ? new T() : poolQueue.Pop();
                 Put(instance);
             }
         }
