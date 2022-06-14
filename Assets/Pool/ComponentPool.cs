@@ -3,15 +3,15 @@ using UnityEngine;
 
 namespace ObjectPool
 {
-    public class ComponentObjectPool<T> where T : Component
+    public class ComponentPool<T> where T : Component
     {
-        private static readonly Dictionary<Component, ComponentObjectPool<T>> PoolsPool = new Dictionary<Component, ComponentObjectPool<T>>();
+        private static readonly Dictionary<Component, ComponentPool<T>> PoolsPool = new Dictionary<Component, ComponentPool<T>>();
 
-        public static ComponentObjectPool<T> Get(Component instance, int fillAmount, HideFlags flags, bool dontDestroyOnLoad)
+        public static ComponentPool<T> Get(Component instance, int fillAmount, HideFlags flags, bool dontDestroyOnLoad)
         {
             if (!PoolsPool.ContainsKey(instance))
             {
-                ComponentObjectPool<T> poolInstance = new ComponentObjectPool<T>(instance, flags, dontDestroyOnLoad);
+                ComponentPool<T> poolInstance = new ComponentPool<T>(instance, flags, dontDestroyOnLoad);
                 PoolsPool.Add(instance, poolInstance);
                 poolInstance.Fill(fillAmount);
             }
@@ -19,68 +19,68 @@ namespace ObjectPool
             return PoolsPool[instance];
         }
 
-        public static ComponentObjectPool<T> Get(Component instance, int fillAmount)
+        public static ComponentPool<T> Get(Component instance, int fillAmount)
         {
             return Get(instance, fillAmount, HideFlags.None, false);
         }
         
-        public static ComponentObjectPool<T> Get(Component instance, HideFlags flags)
+        public static ComponentPool<T> Get(Component instance, HideFlags flags)
         {
             return Get(instance, 0, flags, false);
         }
         
-        public static ComponentObjectPool<T> Get(Component instance, bool dontDestroyOnLoad)
+        public static ComponentPool<T> Get(Component instance, bool dontDestroyOnLoad)
         {
             return Get(instance, 0, HideFlags.None, dontDestroyOnLoad);
         }
         
-        public static ComponentObjectPool<T> Get(Component instance, int fillAmount, bool dontDestroyOnLoad)
+        public static ComponentPool<T> Get(Component instance, int fillAmount, bool dontDestroyOnLoad)
         {
             return Get(instance, fillAmount, HideFlags.None, dontDestroyOnLoad);
         }
         
-        public static ComponentObjectPool<T> Get(Component instance, HideFlags flags, bool dontDestroyOnLoad)
+        public static ComponentPool<T> Get(Component instance, HideFlags flags, bool dontDestroyOnLoad)
         {
             return Get(instance, 0, flags, dontDestroyOnLoad);
         }
 
-        public static ComponentObjectPool<T> Get(Component instance)
+        public static ComponentPool<T> Get(Component instance)
         {
             return Get(instance, 0, HideFlags.None, false);
         }
         
-        public static ComponentObjectPool<T> Get(GameObject instance, int fillAmount, HideFlags flags)
+        public static ComponentPool<T> Get(GameObject instance, int fillAmount, HideFlags flags)
         {
             return Get(instance.transform, fillAmount, flags, false);
         }
         
         
-        public static ComponentObjectPool<T> Get(GameObject instance, int fillAmount)
+        public static ComponentPool<T> Get(GameObject instance, int fillAmount)
         {
             return Get(instance.transform, fillAmount, HideFlags.None, false);
         }
         
-        public static ComponentObjectPool<T> Get(GameObject instance, HideFlags flags)
+        public static ComponentPool<T> Get(GameObject instance, HideFlags flags)
         {
             return Get(instance.transform, 0, flags, false);
         }
         
-        public static ComponentObjectPool<T> Get(GameObject instance, bool dontDestroyOnLoad)
+        public static ComponentPool<T> Get(GameObject instance, bool dontDestroyOnLoad)
         {
             return Get(instance.transform, 0, HideFlags.None, dontDestroyOnLoad);
         }
         
-        public static ComponentObjectPool<T> Get(GameObject instance, int fillAmount, bool dontDestroyOnLoad)
+        public static ComponentPool<T> Get(GameObject instance, int fillAmount, bool dontDestroyOnLoad)
         {
             return Get(instance.transform, fillAmount, HideFlags.None, dontDestroyOnLoad);
         }
         
-        public static ComponentObjectPool<T> Get(GameObject instance, HideFlags flags, bool dontDestroyOnLoad)
+        public static ComponentPool<T> Get(GameObject instance, HideFlags flags, bool dontDestroyOnLoad)
         {
             return Get(instance.transform, 0, flags, dontDestroyOnLoad);
         }
         
-        public static ComponentObjectPool<T> Get(GameObject instance)
+        public static ComponentPool<T> Get(GameObject instance)
         {
             return Get(instance.transform);
         }
@@ -90,7 +90,7 @@ namespace ObjectPool
         private readonly HideFlags hideFlags;
         private readonly bool dontDestroyOnLoad;
         
-        private ComponentObjectPool(Component instance, HideFlags flags, bool dontDestroy)
+        private ComponentPool(Component instance, HideFlags flags, bool dontDestroy)
         {
             poolObject = instance;
             hideFlags = flags;
