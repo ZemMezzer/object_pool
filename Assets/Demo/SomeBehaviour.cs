@@ -13,7 +13,7 @@ namespace ObjectPool.Demo
 
         private void Awake()
         {
-            pooledPool = ComponentPool<PooledObject>.Get(pooledObjectPrefab, 100, HideFlags.HideInHierarchy | HideFlags.HideInInspector, true);
+            pooledPool = ComponentPool<PooledObject>.Get(pooledObjectPrefab, 10, HideFlags.HideInHierarchy | HideFlags.HideInInspector, true);
         }
 
         private IEnumerator Start()

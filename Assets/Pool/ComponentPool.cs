@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace ObjectPool
 {
-    public class ComponentPool<T> where T : Component
+    public class ComponentPool<T> : UnityObjectPool<T> where T : Component
     {
         private static readonly Dictionary<Component, ComponentPool<T>> PoolsPool = new Dictionary<Component, ComponentPool<T>>();
 
@@ -43,17 +43,6 @@ namespace ObjectPool
         {
             return Get(instance, 0, flags, dontDestroyOnLoad);
         }
-
-        public static ComponentPool<T> Get(Component instance)
-        {
-            return Get(instance, 0, HideFlags.None, false);
-        }
-        
-        public static ComponentPool<T> Get(GameObject instance, int fillAmount, HideFlags flags)
-        {
-            return Get(instance.transform, fillAmount, flags, false);
-        }
-        
         
         public static ComponentPool<T> Get(GameObject instance, int fillAmount)
         {
@@ -80,33 +69,39 @@ namespace ObjectPool
             return Get(instance.transform, 0, flags, dontDestroyOnLoad);
         }
         
+        public static ComponentPool<T> Get(GameObject instance, int fillAmount, HideFlags flags)
+        {
+            return Get(instance.transform, fillAmount, flags, false);
+        }
+        
         public static ComponentPool<T> Get(GameObject instance)
         {
             return Get(instance.transform);
         }
-
-        private readonly Stack<T> poolQueue = new Stack<T>();
-        private readonly Component poolObject;
-        private readonly HideFlags hideFlags;
-        private readonly bool dontDestroyOnLoad;
         
-        private ComponentPool(Component instance, HideFlags flags, bool dontDestroy)
+
+        public static ComponentPool<T> Get(Component instance)
         {
-            poolObject = instance;
-            hideFlags = flags;
-            dontDestroyOnLoad = dontDestroy;
+            return Get(instance, 0, HideFlags.None, false);
         }
 
-        public T Get()
+        private ComponentPool(Component instance, HideFlags flags, bool dontDestroy) : base(instance, flags, dontDestroy)
+        {
+            PoolObject = instance;
+            HideFlags = flags;
+            DontDestroyOnLoad = dontDestroy;
+        }
+
+        public override T Get()
         {
             Component instance = null;
-            if (poolQueue.Count <= 0)
+            if (PoolQueue.Count <= 0)
             {
-                instance = Object.Instantiate(poolObject) as T;
+                instance = Object.Instantiate(PoolObject) as T;
                 instance.gameObject.SetActive(true);
-                instance.gameObject.hideFlags = hideFlags;
+                instance.gameObject.hideFlags = HideFlags;
 
-                if(dontDestroyOnLoad)
+                if(DontDestroyOnLoad)
                     Object.DontDestroyOnLoad(instance.gameObject);
                 
                 if(instance is PoolObject poolObjectInstance)
@@ -114,7 +109,7 @@ namespace ObjectPool
             }
             else
             {
-                instance = poolQueue.Pop();
+                instance = PoolQueue.Pop();
                 instance.gameObject.SetActive(true);
             }
             
@@ -142,23 +137,14 @@ namespace ObjectPool
             return instance;
         }
 
-        public void Put(T instance)
+        public override void Put(T instance)
         {
             if(!instance.gameObject.activeInHierarchy)
                 return;
             
             instance.gameObject.SetActive(false);
             instance.transform.SetParent(null);
-            poolQueue.Push(instance);
-        }
-
-        public void Fill(int amount)
-        {
-            for (int i = 0; i < amount; i++)
-            {
-                var instance = Object.Instantiate(poolObject) as T;
-                Put(instance);
-            }
+            PoolQueue.Push(instance);
         }
     }
 }
