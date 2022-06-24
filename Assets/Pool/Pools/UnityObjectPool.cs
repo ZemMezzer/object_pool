@@ -78,7 +78,7 @@ namespace ObjectPool
                 if(DontDestroyOnLoad)
                     Object.DontDestroyOnLoad(instance);
                 
-                if(instance is PoolObject poolObjectInstance)
+                if(instance is IPoolObject poolObjectInstance)
                     poolObjectInstance.Initialize((obj) => Put(obj as T));
             }
             else

@@ -3,13 +3,13 @@ using UnityEngine;
 
 namespace ObjectPool
 {
-    public class PoolObject : MonoBehaviour
+    public abstract class PoolObject : MonoBehaviour, IPoolObject
     {
         private Action<PoolObject> onRelease;
         private bool isInitialized;
         
         
-        public void Initialize(Action<PoolObject> onReleaseCallback)
+        void IPoolObject.Initialize(Action<PoolObject> onReleaseCallback)
         {
             if (isInitialized)
             {
