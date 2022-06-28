@@ -92,6 +92,9 @@ namespace ObjectPool
         public virtual void Put(T instance)
         {
             PoolQueue.Push(instance);
+            
+            if(DontDestroyOnLoad)
+                Object.DontDestroyOnLoad(instance);
         }
         
         public void Fill(int amount)

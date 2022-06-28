@@ -145,6 +145,9 @@ namespace ObjectPool
             instance.gameObject.SetActive(false);
             instance.transform.SetParent(null);
             PoolQueue.Push(instance);
+            
+            if(DontDestroyOnLoad)
+                Object.DontDestroyOnLoad(instance.gameObject);
         }
     }
 }
