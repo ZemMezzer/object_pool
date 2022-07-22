@@ -104,7 +104,7 @@ namespace ObjectPool
                 if(DontDestroyOnLoad)
                     Object.DontDestroyOnLoad(instance.gameObject);
                 
-                if(instance is IPoolObject poolObjectInstance)
+                if(instance is PoolObject poolObjectInstance)
                     poolObjectInstance.Initialize((obj) => Put(obj as T));
             }
             else
